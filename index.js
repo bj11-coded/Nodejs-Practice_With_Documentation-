@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import userRoutes from "./routers/user.routes.js";
 import connectDB from "./database/database.js";
 import postRoutes from "./routers/post.routes.js";
+import fileRouter from "./routers/fileUpload.routes.js";
 
 dotenv.config();
 const PORT = process.env.PORT || 4001;
@@ -18,6 +19,7 @@ connectDB()
 // all routes here 
 app.use("/users", userRoutes)
 app.use("/posts", postRoutes)
+app.use('/file', fileRouter)
 
 // empty routes
 app.get("/",(req, res)=>{
