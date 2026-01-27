@@ -4,6 +4,8 @@ import userRoutes from "./routers/user.routes.js";
 import connectDB from "./database/database.js";
 import postRoutes from "./routers/post.routes.js";
 import fileRouter from "./routers/fileUpload.routes.js";
+import cloudinaryConfig from "./config/cloudinary.js";
+
 
 dotenv.config();
 const PORT = process.env.PORT || 4001;
@@ -15,6 +17,9 @@ app.use(express.urlencoded({extended: true}))
 
 // database connection 
 connectDB()
+
+// cloudinary config
+cloudinaryConfig()
 
 // all routes here 
 app.use("/users", userRoutes)

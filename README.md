@@ -18,10 +18,12 @@
 10. [Authentication & Authorization](#authentication--authorization)
 11. [Password Reset Flow](#password-reset-flow)
 12. [API Endpoints](#api-endpoints)
-13. [Best Practices Learned](#best-practices-learned)
-14. [Common Issues & Solutions](#common-issues--solutions)
-15. [Testing the API](#testing-the-api)
-16. [Environment Variables](#environment-variables)
+13. [File Upload Handling](#file-upload-handling)
+14. [Cloudinary Integration](#cloudinary-integration)
+15. [Best Practices Learned](#best-practices-learned)
+16. [Common Issues & Solutions](#common-issues--solutions)
+17. [Testing the API](#testing-the-api)
+18. [Environment Variables](#environment-variables)
 
 ---
 
@@ -865,6 +867,106 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ---
 
+## 📂 File Upload Handling
+
+The project includes capabilities for handling local file uploads using `multer`.
+
+### Middleware (middleware/fileUpload.middleware.js)
+
+We configure `multer` with `diskStorage` to save files locally:
+
+```javascript
+import multer from "multer";
+
+// Configure storage
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/"); // specific folder
+  },
+  filename: function (req, file, cb) {
+    // Generate unique filename
+    const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}-${file.originalname}`;
+    cb(null, uniqueName);
+  },
+});
+
+// File filter (Images only)
+const filter = (req, file, cb) => {
+  if (file.mimetype == "image/jpeg" || file.mimetype == "image/png") {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  fileFilter: filter,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+});
+
+export default upload;
+```
+
+### File Upload Routes (routers/fileUpload.routes.js)
+
+We expose endpoints for single and multiple file uploads:
+
+| Method | Endpoint         | Description            | Key (Form-Data) |
+| ------ | ---------------- | ---------------------- | --------------- |
+| POST   | `/file/single`   | Upload one image       | `image`         |
+| POST   | `/file/multiple` | Upload multiple images | `image`         |
+
+---
+
+## ☁️ Cloudinary Integration
+
+For production-ready applications, we integrate Cloudinary for cloud storage.
+
+### Configuration (config/cloudinary.js)
+
+Configures the Cloudinary SDK with credentials from environment variables.
+
+```javascript
+import cloudinary from "cloudinary";
+
+const cloudinaryConfig = async () => {
+  try {
+    await cloudinary.config({
+      cloud_name: process.env.CLOUDNAME,
+      api_key: process.env.API_KEY,
+      api_secret: process.env.API_SECRET,
+    });
+    console.log("Cloudinary Configured...");
+  } catch (err) {
+    console.log(err.message);
+  }
+};
+```
+
+### Cloudinary Middleware (middleware/cloudinary.middleware.js)
+
+A custom middleware that:
+
+1. Verifies a file exists in `req.file`
+2. Validates file type and size
+3. Uploads the file to Cloudinary
+4. Attaches the Cloudinary metadata (filename, public_id) back to `req.file`
+
+```javascript
+// Key logic in middleware
+const upload = await cloudinary.v2.uploader.upload(file.path, {
+  folder: "Images",
+  resource_type: "image",
+  overwrite: true,
+});
+req.file.filename = upload.filename;
+req.file.public_id = upload.public_id;
+next();
+```
+
+---
+
 ## ✅ Best Practices Learned
 
 ### 1. **Security**
@@ -1067,6 +1169,11 @@ JWT_SECRETKEY=your_super_secret_jwt_key_here_make_it_long_and_random
 # Email Configuration (for password reset)
 EMAIL=your_email@gmail.com
 PASSWORD=your_app_specific_password
+
+# Cloudinary Configuration
+CLOUDNAME=your_cloud_name
+API_KEY=your_api_key
+API_SECRET=your_api_secret
 ```
 
 ### Gmail App Password Setup:
