@@ -2,14 +2,15 @@ import userController from "../controllers/user.controllers.js";
 import express from "express";
 import authorization from "../middleware/auth.middleware.js";
 import authController from "../controllers/auth.controllers.js";
+import upload from "../middleware/fileUpload.middleware.js";
 
 const router = express.Router();
 
 // all the CRUD Routes Here 
 router.get("/", userController.getAllUsers)
-router.post("/", userController.createUser)
+router.post("/", upload.single("profileImage"), userController.createUser)
 router.delete("/:id", authorization, userController.deleteUser)
-router.put("/:id", authorization, userController.updateUser)
+router.put("/:id", upload.single("profileImage"), userController.updateUser)
 router.get("/:id", authorization, userController.getUserById)
 
 // login 

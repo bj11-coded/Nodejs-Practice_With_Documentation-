@@ -4,39 +4,34 @@ import userRoutes from "./routers/user.routes.js";
 import connectDB from "./database/database.js";
 import postRoutes from "./routers/post.routes.js";
 import fileRouter from "./routers/fileUpload.routes.js";
-import cloudinaryConfig from "./config/cloudinary.js";
-
 
 dotenv.config();
 const PORT = process.env.PORT || 4001;
 const app = express();
 
-// middleware 
-app.use(express.json())
-app.use(express.urlencoded({extended: true}))
+// middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// database connection 
-connectDB()
+// database connection
+connectDB();
 
-// cloudinary config
-cloudinaryConfig()
-
-// all routes here 
-app.use("/users", userRoutes)
-app.use("/posts", postRoutes)
-app.use('/file', fileRouter)
+// all routes here
+app.use("/users", userRoutes);
+app.use("/posts", postRoutes);
+app.use("/file", fileRouter);
 
 // empty routes
-app.get("/",(req, res)=>{
-    res.send(`
+app.get("/", (req, res) => {
+  res.send(`
         <div 
         style="height:100vh; display: flex; justify-content:center; align-items:center; font-size:120px; color: white; background-color: green;">
             Wellcome to Backend API 
         </div>
-        `)
-})
+        `);
+});
 
-// url routes 
-app.listen(PORT, () =>{
-    console.log(`Server is running on port http://localhost:${PORT}`);
-})
+// url routes
+app.listen(PORT, () => {
+  console.log(`Server is running on port http://localhost:${PORT}`);
+});

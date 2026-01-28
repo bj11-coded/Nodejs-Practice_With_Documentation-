@@ -1,5 +1,6 @@
 import userModel from "../models/user.models.js";
-import bcrypt, { genSaltSync } from "bcryptjs";
+import bcrypt from "bcryptjs";
+import cloudinary from "cloudinary";
 
 const userController = {};
 
@@ -32,8 +33,9 @@ userController.getAllUsers = async (req, res) => {
 userController.createUser = async (req, res) => {
   try {
     const { name, email, password, dateOfBirth, address, gender } = req.body;
+    console.log(req.file);
 
-    if (!name || !email || !password || !dateOfBirth || !address || !gender) {
+    if ( !name || !email || !password || !dateOfBirth || !address || !gender || !req.file ) {
       return res.status(400).json({
         success: false,
         message: "All fields are required",
@@ -58,6 +60,10 @@ userController.createUser = async (req, res) => {
       dateOfBirth,
       address,
       gender,
+      profileImage: {
+        url: req.file.path,
+        publicId: req.file.filename,
+      },
     });
 
     res.status(201).json({
@@ -107,6 +113,27 @@ userController.updateUser = async (req, res) => {
     const updatedUser = await userModel.findByIdAndUpdate(id, req.body, {
       new: true,
     });
+
+    if(!req.file){
+      res.status(400).json({
+        success: false,
+        message: "No file uploaded",
+      });
+    }
+
+    // delete the old image 
+    if(updatedUser.profileImage.publicId){
+      await cloudinary.v2.uploader.destroy(updatedUser.profileImage.publicId);
+    }
+
+    // upadte the new image
+    updatedUser.profileImage = {
+      url: req.file.path,
+      publicId: req.file.filename,
+    };
+
+    await updatedUser.save();
+
 
     if (!updatedUser) {
       return res.status(404).json({

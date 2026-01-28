@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema({
         enum:['Male', 'Female','Other'],  // multiple values that can be selected from given data
         required: true
     },
+    profileImage: {
+      url: { type: String },
+      publicId: { type: String },
+    },
     passwordResetToken: String,
     passwordResetExpires: Date,
 },{timestamps:true}
