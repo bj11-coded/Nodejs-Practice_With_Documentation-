@@ -32,7 +32,7 @@ userController.getAllUsers = async (req, res) => {
 // CREATE USER
 userController.createUser = async (req, res) => {
   try {
-    const { name, email, password, dateOfBirth, address, gender } = req.body;
+    const { name, email, password, dateOfBirth, address, gender, role } = req.body;
     console.log(req.file);
 
     if ( !name || !email || !password || !dateOfBirth || !address || !gender || !req.file ) {
@@ -60,6 +60,7 @@ userController.createUser = async (req, res) => {
       dateOfBirth,
       address,
       gender,
+      role,
       profileImage: {
         url: req.file.path,
         publicId: req.file.filename,

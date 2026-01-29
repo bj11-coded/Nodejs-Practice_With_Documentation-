@@ -24,6 +24,7 @@
 16. [Common Issues & Solutions](#common-issues--solutions)
 17. [Testing the API](#testing-the-api)
 18. [Environment Variables](#environment-variables)
+19. [Role Based Access Control (RBAC)](#role-based-access-control)
 
 ---
 
@@ -1189,6 +1190,72 @@ API_SECRET=your_api_secret
 node_modules/
 .env
 .DS_Store
+```
+
+---
+
+---
+
+## 🛡 Role Based Access Control (RBAC)
+
+We have implemented a granular access control system using Roles and Permissions.
+
+### 1. Role Model (`models/role.models.js`)
+
+Defines available roles and their associated permissions.
+
+```javascript
+const roleSchema = new mongoose.Schema({
+  name: String, // e.g., "Admin", "User"
+  permissions: [String], // e.g., ["DELETE", "UPDATE_USER"]
+});
+```
+
+### 2. Middleware Strategy
+
+We use two distinct middleware functions to enforce security:
+
+#### `authRole(role)` (`middleware/authRole.js`)
+
+Validates that the logged-in user holds the specified role.
+
+```javascript
+export const authRole = (role) => {
+  return async (req, res, next) => {
+    const user = await userModel.findById(req.user._id);
+    if (user.role === role) next();
+    else res.status(401).json({ message: "Access Denied" });
+  };
+};
+```
+
+#### `authPremiss(permission)` (`middleware/authPremiss.js`)
+
+Validates that the logged-in user's role grants them the specific permission required.
+
+```javascript
+export const authPremiss = (permission) => {
+  return async (req, res, next) => {
+    const user = await userModel.findById(req.user._id);
+    const role = await roleModel.findOne({ name: user.role });
+    if (role.permissions.includes(permission)) next();
+    else res.status(401).json({ message: "No Permission" });
+  };
+};
+```
+
+### 3. Route Implementation (`routers/user.routes.js`)
+
+Security chains can be constructed by combining middleware:
+
+```javascript
+router.delete(
+  "/:id",
+  authorization, // 1. Verify User is Logged In
+  authRole("User"), // 2. Verify User has "User" Role
+  authPremiss("DELETE"), // 3. Verify Role has "DELETE" Permission
+  userController.deleteUser,
+);
 ```
 
 ---

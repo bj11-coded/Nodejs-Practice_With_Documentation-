@@ -27,7 +27,12 @@ authController.login = async (req, res) => {
       message: "User Logged in Successfully...",
       success: true,
       payload: {
-        data: { email: user.email, name: user.name, _id: user._id },
+        data: {
+          email: user.email,
+          name: user.name,
+          _id: user._id,
+          role: user.role,
+        },
         token: token,
       },
     });
