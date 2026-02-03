@@ -30,7 +30,7 @@ postController.createPost = async (req, res) => {
     if (!title || !description || !postedBy) {
       return res.status(400).json({
         success: false,
-        message: "All fields are required",
+        message: "All fields are required"
       });
     }
 
@@ -39,12 +39,12 @@ postController.createPost = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Post created successfully",
-      payload: newPost,
+      payload: newPost
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: err.message,
+      message: err.message
     });
   }
 };
@@ -56,7 +56,7 @@ postController.getPostById = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid post ID",
+        message: "Invalid post ID"
       });
     }
 

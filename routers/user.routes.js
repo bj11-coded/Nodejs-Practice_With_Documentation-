@@ -5,12 +5,13 @@ import authController from "../controllers/auth.controllers.js";
 import upload from "../middleware/fileUpload.middleware.js";
 import { authRole } from "../middleware/authRole.js";
 import { authPremiss } from "../middleware/authPremiss.js";
+import { validateUser } from "../middleware/validation.js";
 
 const router = express.Router();
 
 // all the CRUD Routes Here 
 router.get("/", userController.getAllUsers)
-router.post("/", upload.single("profileImage"), userController.createUser)
+router.post("/", upload.single("profileImage"), validateUser, userController.createUser)
 router.delete("/:id",authorization, authRole("User"),authPremiss("DELETE"), userController.deleteUser)
 
 router.put("/:id", upload.single("profileImage"), userController.updateUser)
