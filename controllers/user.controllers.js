@@ -32,10 +32,11 @@ userController.getAllUsers = async (req, res) => {
 // CREATE USER
 userController.createUser = async (req, res) => {
   try {
-    const { name, email, password, dateOfBirth, address, gender, role } = req.body;
+    const { name, email, password, dateOfBirth, address, gender, role } =
+      req.body;
     console.log(req.file);
 
-    if ( !name || !email || !password || !dateOfBirth || !address || !gender || !req.file ) {
+    if (!name || !email || !password || !dateOfBirth || !address || !gender) {
       return res.status(400).json({
         success: false,
         message: "All fields are required",
@@ -115,15 +116,15 @@ userController.updateUser = async (req, res) => {
       new: true,
     });
 
-    if(!req.file){
+    if (!req.file) {
       res.status(400).json({
         success: false,
         message: "No file uploaded",
       });
     }
 
-    // delete the old image 
-    if(updatedUser.profileImage.publicId){
+    // delete the old image
+    if (updatedUser.profileImage.publicId) {
       await cloudinary.v2.uploader.destroy(updatedUser.profileImage.publicId);
     }
 
@@ -134,7 +135,6 @@ userController.updateUser = async (req, res) => {
     };
 
     await updatedUser.save();
-
 
     if (!updatedUser) {
       return res.status(404).json({

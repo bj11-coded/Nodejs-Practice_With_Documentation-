@@ -5,6 +5,10 @@ import connectDB from "./database/database.js";
 import postRoutes from "./routers/post.routes.js";
 import fileRouter from "./routers/fileUpload.routes.js";
 
+// swagger
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
+
 dotenv.config();
 const PORT = process.env.PORT || 4001;
 const app = express();
@@ -15,6 +19,26 @@ app.use(express.urlencoded({ extended: true }));
 
 // database connection
 connectDB();
+
+// swagger implementation
+const options = {
+  swaggerDefinition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Nodejs Practice API",
+      version: "1.0.0",
+      description:
+        "This Backend system is created to practice Nodejs with different third party packages",
+    },
+    servers:[{url:"http://localhost:4000"}],
+  },
+  apis: ["./routers/*.routes.js"],
+  
+};
+
+// routes for swagger UI
+const swagger = swaggerJSDoc(options);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swagger));
 
 // all routes here
 app.use("/users", userRoutes);
