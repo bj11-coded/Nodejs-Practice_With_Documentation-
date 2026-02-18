@@ -4,6 +4,8 @@ import userRoutes from "./routers/user.routes.js";
 import connectDB from "./database/database.js";
 import postRoutes from "./routers/post.routes.js";
 import fileRouter from "./routers/fileUpload.routes.js";
+import authorRoutes from "./routers/author.routes.js";
+import bookRoutes from "./routers/book.routes.js";
 
 // swagger
 import swaggerJSDoc from "swagger-jsdoc";
@@ -30,10 +32,9 @@ const options = {
       description:
         "This Backend system is created to practice Nodejs with different third party packages",
     },
-    servers:[{url:"http://localhost:4000"}],
+    servers: [{ url: "http://localhost:4000" }],
   },
   apis: ["./routers/*.routes.js"],
-  
 };
 
 // routes for swagger UI
@@ -44,6 +45,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swagger));
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
 app.use("/file", fileRouter);
+app.use("/authors", authorRoutes);
+app.use("/books", bookRoutes);
 
 // empty routes
 app.get("/", (req, res) => {
